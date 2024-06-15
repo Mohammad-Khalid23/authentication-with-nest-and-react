@@ -5,6 +5,7 @@ import { AuthModule } from './auth/auth.module';
 import { MongooseModule } from '@nestjs/mongoose'
 import { UsersModule } from './users/users.module';
 import authConfig from './auth/config/auth.config';
+import appConfig from './config/app.config';
 
 import { ConfigModule } from '@nestjs/config';
 
@@ -16,6 +17,7 @@ import { ConfigModule } from '@nestjs/config';
     ConfigModule.forRoot({
       isGlobal: true,
       load: [
+        appConfig,
         authConfig,
       ],
       envFilePath: ['.env'],

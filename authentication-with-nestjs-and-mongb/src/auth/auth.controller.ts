@@ -3,20 +3,20 @@ import { AuthService } from './auth.service';
 import { RegisterAuthDto } from './dto/resgister-auth-dto';
 import { LoginAuthDto } from './dto/login-auth-dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
+import { LoginResponseDto } from './dto/login-response.dto';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('register')
-  // @HttpCode(HttpStatus.OK)
-  async resgiter(@Body() registerAuthDto: RegisterAuthDto) {
-    return await this.authService.register(registerAuthDto);
+  async resgiter(@Body() registerAuthDto: RegisterAuthDto): Promise<LoginResponseDto> {
+    return this.authService.register(registerAuthDto);
   }
 
   @Post('login')
  async login(@Body() loginAuthDto: LoginAuthDto) {
-    return await this.authService.login(loginAuthDto);
+    return this.authService.login(loginAuthDto);
   }
 
   @Get()
