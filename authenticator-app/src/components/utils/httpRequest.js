@@ -9,7 +9,6 @@ const HttpRequest = async (endpoint, headers = {}, body) => {
                 'Content-Type': 'application/json'
             },
         };
-        
 
         if (body) {
             requestObject.body = JSON.stringify(body);
@@ -20,7 +19,7 @@ const HttpRequest = async (endpoint, headers = {}, body) => {
         return response.json();
 
     } catch (error) {
-        console.log(error)
+        console.error("-----Erorr",error)
     }
 };
 export default HttpRequest;

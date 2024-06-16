@@ -1,24 +1,24 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, HttpStatus } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { RegisterAuthDto } from './dto/resgister-auth-dto';
-import { LoginAuthDto } from './dto/login-auth-dto';
+import { SignupAuthDto } from './dto/signup-auth-dto';
+import { SigninAuthDto } from './dto/signin-auth-dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
-import { LoginResponseDto } from './dto/login-response.dto';
+import { SigninResponseDto } from './dto/signin-response.dto';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Post('register')
+  @Post('signup')
   @HttpCode(HttpStatus.OK)
-  async resgiter(@Body() registerAuthDto: RegisterAuthDto): Promise<LoginResponseDto> {
-    return this.authService.register(registerAuthDto);
+  async signup(@Body() signupAuthDto: SignupAuthDto): Promise<SigninResponseDto> {
+    return this.authService.signup(signupAuthDto);
   }
 
-  @Post('login')
+  @Post('signin')
   @HttpCode(HttpStatus.OK)
- async login(@Body() loginAuthDto: LoginAuthDto) {
-    return this.authService.login(loginAuthDto);
+ async signin(@Body() signinAuthDto: SigninAuthDto) {
+    return this.authService.signin(signinAuthDto);
   }
 
   @Get()

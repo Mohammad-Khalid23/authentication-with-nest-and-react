@@ -9,10 +9,11 @@ import { User } from './entities/user.schema';
 export class UsersService {
   constructor(@InjectModel(User.name) private userModel: Model<User>) {}
 
-  create(dto: CreateUserDto) : Promise<User> {
+ async create(dto: CreateUserDto) : Promise<User> {
     console.log("----------USer dto",dto)
     const createdUser = new this.userModel(dto);
-    return createdUser.save();
+    let user = await createdUser.save();
+    return user.toObject({ getters: true, virtuals: true });
   }
 
   findAll() {

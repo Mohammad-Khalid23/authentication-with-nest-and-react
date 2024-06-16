@@ -1,6 +1,6 @@
 import { Injectable, UnprocessableEntityException, UnauthorizedException, NotFoundException, HttpStatus } from '@nestjs/common';
-import { RegisterAuthDto } from './dto/resgister-auth-dto';
-import { LoginAuthDto } from './dto/login-auth-dto';
+import { SignupAuthDto } from './dto/signup-auth-dto';
+import { SigninAuthDto } from './dto/signin-auth-dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
 import { UsersService } from '../users/users.service';
 import { genSaltSync, hashSync, compareSync } from 'bcrypt';
@@ -15,63 +15,66 @@ export class AuthService {
     private configService: ConfigService,
   ){}
 
- async register(resgiterAuthDto: RegisterAuthDto) {
-    console.log('------------resgiterAuthDto',resgiterAuthDto)
+ async signup(signupAuthDto: SignupAuthDto) {
 
-  const userExist = await this.userService.findOne(resgiterAuthDto.email);
+  const userExist = await this.userService.findOne(signupAuthDto.email);
   
   if(userExist){
     throw new UnprocessableEntityException({
       status: HttpStatus.UNPROCESSABLE_ENTITY,
-      errors: {
-        message: "User already exist with provided email,Please Login",
-      },
+      error:  "User already exist with provided email,Please Login",
     });
   }
   
   const generatedSalt = await genSaltSync(10);
 
-   const passwordHash = await hashSync(resgiterAuthDto.password, generatedSalt);
-   console.log("--------generated salt", generatedSalt)
-   console.log('--------password hash', passwordHash);
+   const passwordHash = await hashSync(signupAuthDto.password, generatedSalt);
 
-   resgiterAuthDto.password = passwordHash
-   await this.userService.create(resgiterAuthDto);
+   signupAuthDto.password = passwordHash
+   let createdUser = await this.userService.create(signupAuthDto);
+
+   const hash = await this.jwtService.signAsync(
+     createdUser,
+    {
+      secret: this.configService.getOrThrow('auth.secret', {
+        infer: true,
+      }),
+      expiresIn: this.configService.getOrThrow('auth.expires', {
+        infer: true,
+      }),
+    },
+  );
 
    return {
-     status: true,
+     status: HttpStatus.OK,
      message: "Register successfully",
+     data : {
+       token: hash
+     }
    };
  }
 
-  async login(loginAuthDto: LoginAuthDto) {
-    console.log('------------loginAuthDto', loginAuthDto)
+  async signin(signinAuthDto: SigninAuthDto) {
 
-    const userExist = await this.userService.findOne(loginAuthDto.email);
+    const userExist = await this.userService.findOne(signinAuthDto.email);
 
     if (!userExist) {
       throw new NotFoundException({
         status: HttpStatus.NOT_FOUND,
-        errors: {
-          message: "User not found,Please Register",
-        },
+        error: "User not found,Please Register",
       });
     }
 
 
-    const isPasswordMatched = await compareSync(loginAuthDto.password, userExist.password);
-    console.log("--------isPasswordMatched", isPasswordMatched)
+    const isPasswordMatched = await compareSync(signinAuthDto.password, userExist.password);
 
 
     if (!isPasswordMatched) {
       throw new UnauthorizedException({
         status: HttpStatus.UNAUTHORIZED,
-        errors: {
-          message: "Invalid password",
-        },
+        error:"Invalid password",
       });
     }
-console.log("----------userExist",userExist)
     const hash = await this.jwtService.signAsync(
       userExist,
       {
@@ -83,11 +86,9 @@ console.log("----------userExist",userExist)
         }),
       },
     );
-    console.log('-------------token----------', hash)
-    // await this.userService.create(loginAuthDto);
 
     return {
-      status: true,
+      status: HttpStatus.OK,
       message: "Logged in successfully",
       data:{
         token: hash

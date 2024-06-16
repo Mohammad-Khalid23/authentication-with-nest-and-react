@@ -2,14 +2,14 @@ import { IsEmail, IsNotEmpty, MinLength } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { lowerCaseTransformer } from '../../utils/transformers/lower-case.transformer';
 
-export class RegisterAuthDto {
+export class SignupAuthDto {
     @Transform(lowerCaseTransformer)
+    @IsNotEmpty()
+    name: string;
+
     @IsEmail()
     email: string;
   
-    @MinLength(6)
+    @MinLength(8)
     password: string;
-  
-    @IsNotEmpty()
-    name: string;
 }
