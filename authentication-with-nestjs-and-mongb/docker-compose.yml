@@ -1,0 +1,34 @@
+version: '3'
+
+services:
+  authenticator-backend:
+    container_name: authenticator-app
+    image: authenticator-api
+    build:
+      dockerfile: Dockerfile
+      context: .
+    ports:
+      - "5000:5000"
+    networks:
+      - backend_network
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    restart: unless-stopped
+    depends_on:
+      - mongodb
+
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    volumes:
+      - ./database:/data/db
+    ports:
+      - "27017:27017"
+    networks:
+      - backend_network
+    restart: always
+
+networks:
+  backend_network:
+    driver: bridge
