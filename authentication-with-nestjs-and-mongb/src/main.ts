@@ -25,6 +25,6 @@ async function bootstrap() {
     type: VersioningType.URI,
   });
   app.useGlobalPipes(new ValidationPipe());
-  await app.listen(3000);
+  await app.listen(configService.getOrThrow('app.port'));
 }
 bootstrap();

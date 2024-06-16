@@ -2,7 +2,7 @@ import { registerAs } from '@nestjs/config';
 import { AppConfig } from './app-config.type';
 
 export default registerAs<AppConfig>('app', () => {
-
+console.log("-------(process.env",process.env)
   return {
     nodeEnv: process.env.NODE_ENV || 'development',
     name: process.env.APP_NAME || 'app',
